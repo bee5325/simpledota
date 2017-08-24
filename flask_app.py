@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, request, url_for
+from os import environ
 #from flask_sqlalchemy import SQLAlchemy
 
 from simpledota import Simpledota
@@ -77,5 +78,7 @@ def getTimeRange():
         days = 30
     return days
 
-if __name__ == "__main__":
-	app.run()
+if __name__ == '__main__':
+    # Bind to PORT if defined, otherwise default to 5000.
+    port = int(environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
