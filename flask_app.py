@@ -1,6 +1,9 @@
 from flask import Flask, render_template, redirect, request, url_for
 from os import environ
 #from flask_sqlalchemy import SQLAlchemy
+from leaderboard import *
+from compare import *
+from suggest import *
 
 from simpledota import Simpledota
 
@@ -33,19 +36,19 @@ class Comment(db.Model):
 def leaderboard():
     playerlist = getPlayerlist()
     days = getTimeRange()
-    result = Simpledota.leaderboard(playerlist, days)
+    result = Leaderboard.leaderboard(playerlist, days)
     return "LEADER : " + str(result)
 
 @app.route('/compare')
 def compare():
     playerlist = getPlayerlist()
-    result = Simpledota.compare(playerlist)
+    result = Compare.compare(playerlist)
     return "COMPARE : " + str(result)
 
 @app.route('/suggest')
 def suggest():
     playerlist = getPlayerlist()
-    result = Simpledota.suggest(playerlist)
+    result = Suggest.suggest(playerlist)
     return "SUGGEST : " + str(result)
 
 @app.route('/', methods=["GET", "POST"])
