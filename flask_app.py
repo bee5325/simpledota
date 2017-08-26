@@ -5,8 +5,6 @@ from leaderboard import *
 from compare import *
 from suggest import *
 
-from simpledota import Simpledota
-
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
@@ -42,7 +40,8 @@ def leaderboard():
 @app.route('/compare')
 def compare():
     playerlist = getPlayerlist()
-    result = Compare.compare(playerlist)
+    attribute = request.args.get("attr")
+    result = Compare.compare(playerlist, attribute)
     return "COMPARE : " + str(result)
 
 @app.route('/suggest')
