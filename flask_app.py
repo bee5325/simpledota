@@ -4,11 +4,10 @@ from os import environ
 from leaderboard import *
 from compare import *
 from suggest import *
+from heroes import *
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
-
-Simpledota.Initialise()
 
 '''
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
@@ -49,6 +48,11 @@ def suggest():
     playerlist = getPlayerlist()
     result = Suggest.suggest(playerlist)
     return "SUGGEST : " + str(result)
+
+@app.route('/heroes')
+def heroes():
+    Heroes.initialise()
+    return "HEROES : \n" + str(Heroes.heroes)
 
 @app.route('/', methods=["GET", "POST"])
 def index():
