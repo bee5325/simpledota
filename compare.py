@@ -19,8 +19,10 @@ class Compare:
         Compare.response['attribute'] = attribute
         try:
             playersAttribute = Compare.getAttribute(players, attribute)
-        except ValueError:
+        except ValueError as e:
             return "{attribute} is not a valid attribute for compare".format(attribute=attribute)
+        except IOError:
+            return e
         Compare.compareByAttribute(playersAttribute)
         result = Compare.formatResponse()
         return result
@@ -30,7 +32,7 @@ class Compare:
         try:
             for player in players:
                 playerAttribute[player] = DotaRequest.get(attribute, {'player' : player})
-        except ValueError:
+        except (ValueError, IOError):
             raise
         return playerAttribute
 
@@ -57,7 +59,7 @@ class Compare:
         Compare.response['other'] = otherDict
 
     def formatResponse():
-        responseItem = OrderedDict([
+        formattedResponse = OrderedDict([
             ('attribute',  Compare.response['attribute']),
             ('winner', OrderedDict([
                 ('player_id', Compare.response['winner']['player_id']),
@@ -68,7 +70,7 @@ class Compare:
                 ('score', Compare.response['other']['score'])
             ]))
         ])
-        return json.dumps(responseItem)
+        return json.dumps(formattedResponse)
 
 if __name__== "__main__":
     print(Compare.compare([70388657, 91369376]))

@@ -1,8 +1,8 @@
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, request, url_for
 from os import environ
 import calendar
 import datetime
-#from flask_sqlalchemy import SQLAlchemy
+
 from leaderboard import *
 from compare import *
 from suggest import *
@@ -13,57 +13,66 @@ app.config["DEBUG"] = True
 
 @app.route('/leaderboard')
 def leaderboard():
-    playerlist = getPlayerlist()
+    try:
+        playerlist = getPlayerlist()
+    except ValueError:
+        return "Error : Invalid player given, please provide Steam32 account id"
     days = getTimeRange()
     result = Leaderboard.leaderboard(playerlist, days)
-    return "LEADER : " + str(result)
+    return str(result)
 
 @app.route('/compare')
 def compare():
-    playerlist = getPlayerlist()
+    try:
+        playerlist = getPlayerlist()
+    except ValueError:
+        return "Error : Invalid player given, please provide Steam32 account id"
     attribute = request.args.get("attr")
     result = Compare.compare(playerlist, attribute)
-    return "COMPARE : " + str(result)
+    return str(result)
 
 @app.route('/suggest')
 def suggest():
-    playerlist = getPlayerlist()
+    try:
+        playerlist = getPlayerlist()
+    except ValueError:
+        return "Error : Invalid player given, please provide Steam32 account id"
     result = Suggest.suggest(playerlist)
-    return "SUGGEST : " + str(result)
+    return str(result)
 
 @app.route('/heroes')
 def heroes():
     Heroes.initialise()
-    return "HEROES : \n" + str(Heroes.heroes)
+    return str(Heroes.heroes)
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    if request.method == "GET":
-        return "This is the home page"
-        #match = api.get_match_details(match_id=1000193456)
-        #return str(match['radiant_win'])
-        #return render_template("main_page.html", comments=Comment.query.all())
-
-    #comment = Comment(content=request.form["contents"])
-    #db.session.add(comment)
-    #db.session.commit()
-    return redirect(url_for('index'))
+    displayText = "\n".join([
+    "To get the leaderbaord, use url {leaderboard};".format(leaderboard=url_for('leaderboard', _external=True)),
+    "To compare players, use url {compare};".format(compare=url_for('compare', _external=True)),
+    "To suggest hero for a player, use url {suggest}".format(suggest=url_for('suggest', _external=True))
+    ])
+    return displayText
 
 def getPlayerlist():
-    playerlist = [int(value) for value in request.args.getlist("player")]
+    try:
+        playerlist = [int(value) for value in request.args.getlist("player")]
+    except ValueError:
+        raise
     return playerlist
 
 def getTimeRange():
-    if not request.args.get("time"):
-        days = 7 # default to 7 days
+    days = 7 # default to 7 days
     if len(request.args.getlist("time")) > 1:
         raise Exception("More than one time range has been specified. Please don't specify more than one time range.")
-    elif request.args.get("time") == "today":
+    elif request.args.get("time") == "last_day":
         days = 1
-    elif request.args.get("time") == "this_week":
+    elif request.args.get("time") == "last_week":
         days = 7
-    elif request.args.get("time") == "this_month":
+    elif request.args.get("time") == "last_month":
         days = getDaysInLastMonth()
+    elif request.args.get("time") == "last_year":
+        days = 366 if calendar.isleap(datetime.today().year - 1) else 365
     return days
 
 def getDaysInLastMonth():
