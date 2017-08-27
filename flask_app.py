@@ -1,5 +1,7 @@
 from flask import Flask, render_template, redirect, request, url_for
 from os import environ
+import calendar
+import datetime
 #from flask_sqlalchemy import SQLAlchemy
 from leaderboard import *
 from compare import *
@@ -8,26 +10,6 @@ from heroes import *
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
-
-'''
-SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    username="bee5325",
-    password="i am learning web api",
-    hostname="bee5325.mysql.pythonanywhere-services.com",
-    databasename="bee5325$comments"
-    )
-app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
-app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db = SQLAlchemy(app)
-
-class Comment(db.Model):
-    __tablename__ = "comments"
-
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(4096))
-'''
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -81,8 +63,15 @@ def getTimeRange():
     elif request.args.get("time") == "this_week":
         days = 7
     elif request.args.get("time") == "this_month":
-        days = 30
+        days = getDaysInLastMonth()
     return days
+
+def getDaysInLastMonth():
+    daysInLastMonth = [None, 31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30]
+    today = datetime.today()
+    if calendar.isleap(today.year):
+        daysInLastMonth[3] += 1
+    return daysInLastMonth[today.month]
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
