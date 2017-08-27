@@ -30,26 +30,26 @@ class DotaRequest:
         elif field == "kills_count":
             url = "{base}/players/{player}/totals".format(base=DotaRequest.base_url, player=args['player'])
             response = requests.get(url)
-            killsCount = (value['sum'] for value in response.json() if value['field']=='kills')
-            returnValue = killsCount
+            killsCount = [value['sum'] for value in response.json() if value['field']=='kills']
+            returnValue = killsCount[0]
 
         elif field == "kda":
             url = "{base}/players/{player}/totals".format(base=DotaRequest.base_url, player=args['player'])
             response = requests.get(url)
-            kda = (value['sum'] for value in response.json() if value['field']=='kda')
-            returnValue = kda
+            kda = [value['sum'] for value in response.json() if value['field']=='kda']
+            returnValue = kda[0]
 
         elif field == "gold_per_min":
             url = "{base}/players/{player}/totals".format(base=DotaRequest.base_url, player=args['player'])
             response = requests.get(url)
-            gpm = (value['sum'] for value in response.json() if value['field']=='gold_per_min')
-            returnValue = gpm
+            gpm = [value['sum'] for value in response.json() if value['field']=='gold_per_min']
+            returnValue = gpm[0]
 
         elif field == "xp_per_min":
             url = "{base}/players/{player}/totals".format(base=DotaRequest.base_url, player=args['player'])
             response = requests.get(url)
-            xpm = (value['sum'] for value in response.json() if value['field']=='xp_per_min')
-            returnValue = xpm
+            xpm = [value['sum'] for value in response.json() if value['field']=='xp_per_min']
+            returnValue = xpm[0]
 
         elif field == "heroes":
             url = "{base}/heroes".format(base=DotaRequest.base_url)
